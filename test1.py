@@ -5,6 +5,8 @@ from datetime import datetime
 import logging
 logging.basicConfig(level=logging.ERROR)
 
+msg_list = []
+
 # 向消息队列发送消息
 def send_to_queue(ip_addr, port, queue_name, msg):
     # 初始化欲连接的Queue 指定Ip及Port
@@ -19,7 +21,7 @@ def send_to_queue(ip_addr, port, queue_name, msg):
     pass
 
 # Listener 类
-class Listener(object):
+class Listener(stomp.ConnectionListener):
     def __init__(self):
         # logging.INFO(str(datetime.now()) + ":A new Listener has been created.")
         self.headers = ""
@@ -30,8 +32,16 @@ class Listener(object):
         # logging.INFO(str(datetime.now()) + 'message: %s' % message)
         self.headers = headers
         self.message = message
-        print type(headers)
-        print type(message)
+        print headers
+        # print message
+        # print type(headers)
+        # print type(message)
+        print "After eval : %s" % eval(message)
+        # Actions after received messages here:
+        # ----------- #
+
+
+        # ----------- #
 
     def get_headers(self):
         return self.headers
@@ -50,15 +60,16 @@ def receive_from_queue(ip_addr, port, queue_name):
     conn.connect("admin","admin",wait=False)
     # 从指定的队列名字中接收消息
     conn.subscribe(queue_name)
-    time.sleep(1)
-    print "headers : %s" % listener.get_headers()
-    print "message : %s" % listener.get_message()
+    time.sleep(0.1)
+    # print "headers : %s" % listener.get_headers()
+    # print "message : %s" % listener.get_message()
     conn.disconnect()
     pass
 
 
 if __name__ == '__main__':
-    send_to_queue('39.107.239.80', '61613', '/queue/Test_Queue', "{'name':'Mike'}")
+    send_to_queue('39.107.239.80', '61613', '/queue/Test_Queue', "{'name':'Mike','command':'kubectl get nodes'}")
     send_to_queue('39.107.239.80', '61613', '/queue/Test_Queue', "{'name':'Sandy'}")
+    send_to_queue('39.107.239.80', '61613', '/queue/Test_Queue', "{'name':'Bob'}")
     receive_from_queue('39.107.239.80', '61613', '/queue/Test_Queue')
     print "end"
