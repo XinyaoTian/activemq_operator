@@ -1,7 +1,7 @@
 from funcPackage.MQOperator import MQOperator
 
 import logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(filename='./logs/MQreceiverERR.log',format='[%(asctime)s-%(filename)s-%(levelname)s:%(message)s]', filemode='a',level = logging.ERROR,datefmt='%Y-%m-%d %I:%M:%S %p')
 
 if __name__ == "__main__":
     mqOperator = MQOperator("./MQOperator_conf.json")

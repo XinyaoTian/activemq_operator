@@ -3,7 +3,7 @@ import stomp
 import time
 from datetime import datetime
 import logging
-logging.basicConfig(level=logging.ERROR)
+logging.basicConfig(filename='./logs/MQreceiverERR.log',format='[%(asctime)s-%(filename)s-%(levelname)s:%(message)s]', filemode='a',level = logging.ERROR,datefmt='%Y-%m-%d %I:%M:%S %p')
 
 from json_reader import get_conf
 
