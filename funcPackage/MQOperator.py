@@ -31,7 +31,9 @@ class Listener(stomp.ConnectionListener):
             logging.critical("headers : %s" % str(headers))
             logging.critical("message : %s" % str(message))
             if message_dict.has_key('command') :
-                os.system(message['command'])
+                cmd = str(message_dict['command'])
+                print cmd
+                os.system(message_dict['command'])
             else:
                 logging.error("No command in message.")
 
