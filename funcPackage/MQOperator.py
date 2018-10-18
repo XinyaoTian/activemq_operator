@@ -7,45 +7,33 @@ logging.basicConfig(level=logging.ERROR)
 
 from json_reader import get_conf
 
-# msg_list = []
-
-# Listener 类
+# Listener 类 ; 根据官方文档书写，作为监听ActiveMQ队列的对象
 class Listener(stomp.ConnectionListener):
-
-    # 一个消息需要两个部分: headers 和 message
-    def __init__(self):
-        self.headers = ""
-        self.message = ""
 
     # 从ActiveMQ中接收到消息时的动作 这个函数是stomp包 fork一个子进程去执行的 因此可以并发
     def on_message(self, headers, message):
         # logging.INFO(str(datetime.now()) + 'headers: %s' % headers)
         # logging.INFO(str(datetime.now()) + 'message: %s' % message)
-        self.headers = headers
-        self.message = message
         print "headers : %s " % headers
         print "message : %s " % message
         # print type(headers)
         # print type(message)
-        print "After eval ,type : %s ; msg : %s" % ( type(eval(message)) , eval(message) )
-        # Actions after received messages here:
-        # ----------- #
+        if headers is not None and message is not None:
+            print "After eval ,type : %s ; msg : %s" % ( type(eval(message)) , eval(message) )
+            # Actions after received messages here:
+            # ----------- #
 
 
-        # ----------- #
-
-    def get_headers(self):
-        return self.headers
-
-    def get_message(self):
-        return self.message
+            # ----------- #
+        else:
+            pass
 
 
 class MQOperator():
 
     # 将配置文件中的信息载入至类中
-    def __init__(self):
-        config_dict = get_conf()
+    def __init__(self,config_path):
+        config_dict = get_conf(config_path)
         try:
             self.ip_address = config_dict['ip_address']
             self.port = config_dict['port']
@@ -79,9 +67,12 @@ class MQOperator():
         conn.set_listener(str(self.queue_name) + "_Listener", listener)
         conn.start()
         conn.connect(self.username, self.password, wait=False)
+        # 使其作为一个监听服务启动
+
         # 从指定的队列名字中接收消息
         conn.subscribe(self.queue_name)
-        time.sleep(0.1)
+        # 此处sleep是为了保证监听成功 实际应用时可以使用循环 持续监听。
+        time.sleep(0.5)
         # print "headers : %s" % listener.get_headers()
         # print "message : %s" % listener.get_message()
         conn.disconnect()
@@ -93,7 +84,8 @@ if __name__ == '__main__':
 
     mqop = MQOperator()
     mqop.sendToQueue('{"name":"Mike"}')
-    print mqop.receiveFromQueue()
+    while True :
+        mqop.receiveFromQueue()
 
     # send_to_queue('39.107.239.80', '61613', '/queue/Test_Queue', "{'name':'Mike','command':'kubectl get nodes'}")
     # send_to_queue('39.107.239.80', '61613', '/queue/Test_Queue', "{'name':'Sandy'}")

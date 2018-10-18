@@ -1,5 +1,6 @@
 # -*- encoding:utf-8 -*-
 import json
+import os
 
 # 读取默认位置的配置文件
 def get_conf(file_path="../MQOperator_conf.json"):
@@ -13,4 +14,6 @@ def get_json(file_path):
     f.close()
     return temp
 
-# print get_conf()
+
+if __name__ == "__main__":
+    print get_conf()
