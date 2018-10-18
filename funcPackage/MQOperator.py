@@ -3,7 +3,10 @@ import stomp
 import time
 from datetime import datetime
 import logging
-logging.basicConfig(filename='./logs/MQreceiverERR.log',format='[%(asctime)s-%(filename)s-%(levelname)s:%(message)s]', filemode='a',level = logging.ERROR,datefmt='%Y-%m-%d %I:%M:%S %p')
+# 注意 这里写的日志打印路径是在运行 MQreceiver.py 时 系统的pwd
+logging.basicConfig(filename='./logs/MQreceiver.log',format='[%(asctime)s-%(filename)s-%(levelname)s:%(message)s]', filemode='w',level = logging.ERROR,datefmt='%Y-%m-%d %I:%M:%S %p')
+
+import os
 
 from json_reader import get_conf
 
@@ -22,7 +25,15 @@ class Listener(stomp.ConnectionListener):
             print "After eval ,type : %s ; msg : %s" % ( type(eval(message)) , eval(message) )
             # Actions after received messages here:
             # ----------- #
-
+            # 执行传入的命令
+            message_dict = eval(message)
+            logging.critical("Receive a massage.")
+            logging.critical("headers : %s" % str(headers))
+            logging.critical("message : %s" % str(message))
+            try:
+                os.system(message['command'])
+            except:
+                logging.ERROR("No command in message.")
 
             # ----------- #
         else:
@@ -32,17 +43,19 @@ class Listener(stomp.ConnectionListener):
 class MQOperator():
 
     # 将配置文件中的信息载入至类中
-    def __init__(self,config_path):
-        config_dict = get_conf(config_path)
+    def __init__(self,config_path = "../MQOperator_conf.json"):
+        logging.critical("MQOperator start.")
+        logging.critical("Loading config from %s ." % config_path)
         try:
+            config_dict = get_conf(config_path)
+            logging.critical("Your config information is %s ." % config_dict)
             self.ip_address = config_dict['ip_address']
             self.port = config_dict['port']
             self.queue_name = config_dict['queue_name']
             self.username = config_dict['username']
             self.password = config_dict['password']
         except:
-            logging.ERROR("The configration file can not load correctly.Please check MQOperator_conf.json again.")
-            logging.ERROR("Your config info is : %s" % str(config_dict))
+            logging.ERROR("The configration file can not load correctly.Please check %s again." % config_path)
             raise Exception
 
     # 向ActiveMQ发送消息
