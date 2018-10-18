@@ -13,4 +13,4 @@ def get_json(file_path):
     f.close()
     return temp
 
-print get_conf()
+# print get_conf()
