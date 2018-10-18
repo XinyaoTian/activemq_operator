@@ -30,10 +30,10 @@ class Listener(stomp.ConnectionListener):
             logging.critical("Receive a massage.")
             logging.critical("headers : %s" % str(headers))
             logging.critical("message : %s" % str(message))
-            try:
+            if message_dict.has_key('command') :
                 os.system(message['command'])
-            except:
-                logging.ERROR("No command in message.")
+            else:
+                logging.error("No command in message.")
 
             # ----------- #
         else:
