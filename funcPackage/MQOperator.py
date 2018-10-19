@@ -12,6 +12,26 @@ from json_reader import get_conf
 
 # Listener 类 ; 根据官方文档书写，作为监听ActiveMQ队列的对象
 class Listener(stomp.ConnectionListener):
+    # 从ActiveMQ中接收到消息时的动作 这个函数是stomp包 fork一个子进程去执行的 因此可以并发
+    def on_message(self, headers, message):
+        # logging.INFO(str(datetime.now()) + 'headers: %s' % headers)
+        # logging.INFO(str(datetime.now()) + 'message: %s' % message)
+        print "headers : %s " % headers
+        print "message : %s " % message
+        # print type(headers)
+        # print type(message)
+        if headers is not None :
+            # Actions after received messages here:
+            # ----------- #
+
+
+            # ----------- #
+            pass
+        else:
+            pass
+
+# 改进的 Listener 类 ，拥有特定的用法 ; 根据官方文档书写，作为监听ActiveMQ队列的对象
+class Listener_receive(stomp.ConnectionListener):
 
     # 从ActiveMQ中接收到消息时的动作 这个函数是stomp包 fork一个子进程去执行的 因此可以并发
     def on_message(self, headers, message):
@@ -40,6 +60,42 @@ class Listener(stomp.ConnectionListener):
             # ----------- #
         else:
             pass
+
+# 改进的 Listener 类 ，拥有特定的用法 ; 根据官方文档书写，作为监听ActiveMQ队列的对象
+class Listener_k8s(stomp.ConnectionListener):
+
+    # 从ActiveMQ中接收到消息时的动作 这个函数是stomp包 fork一个子进程去执行的 因此可以并发
+    def on_message(self, headers, message):
+        # logging.INFO(str(datetime.now()) + 'headers: %s' % headers)
+        # logging.INFO(str(datetime.now()) + 'message: %s' % message)
+        print "headers : %s " % headers
+        print "message : %s " % message
+        # print type(headers)
+        # print type(message)
+        if headers is not None and message is not None:
+            print "After eval ,type : %s ; msg : %s" % ( type(eval(message)) , eval(message) )
+            # Actions after received messages here:
+            # ----------- #
+            # 执行传入的命令
+            message_dict = eval(message)
+            logging.critical("Receive a massage.")
+            logging.critical("headers : %s" % str(headers))
+            logging.critical("message : %s" % str(message))
+            # 若这个消息是完整的
+            if message_dict.has_key('type') and  message_dict.has_key('userID') \
+                    and message_dict.has_key('image') and message_dict.has_key('timestamp'):
+
+                #ToDo : 调用K8sCmdFunc.py中的函数来实现功能
+                pass
+
+            # 否则，不予执行
+            else:
+                logging.error("Can not manipulate the message = %s ." % str(message_dict))
+
+            # ----------- #
+        else:
+            pass
+
 
 
 class MQOperator():
@@ -82,7 +138,6 @@ class MQOperator():
         conn.set_listener(str(self.queue_name) + "_Listener", listener)
         conn.start()
         conn.connect(self.username, self.password, wait=False)
-        # 使其作为一个监听服务启动
 
         # 从指定的队列名字中接收消息
         conn.subscribe(self.queue_name)

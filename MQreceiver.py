@@ -1,3 +1,4 @@
+# -*- encoding:utf-8 -*-
 from funcPackage.MQOperator import MQOperator
 
 import logging
@@ -7,5 +8,6 @@ if __name__ == "__main__":
     mqOperator = MQOperator("./MQOperator_conf.json")
     logging.info("The receiver of MQOperator has been opend.")
     print("MQOperator started.")
+    # 使其作为一个监听服务启动
     while True :
         mqOperator.receiveFromQueue()
