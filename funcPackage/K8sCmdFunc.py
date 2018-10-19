@@ -1,16 +1,16 @@
 # -*- encoding:utf-8 -*-
 
-import os
 import logging
 logging.basicConfig(level=logging.INFO)
 
-class K8sOperator():
+class K8sObject():
 
     # 需要的类型为 k8s_cmd 的类型 用户标识 启动的镜像 以及时间戳
-    def __init__(self , k8s_cmd_type , userID , image , timestamp , port="[]"):
+    def __init__(self , k8s_cmd_type, userID, timestamp, image, image_version="lastest", port="[]"):
         self.type = k8s_cmd_type
         self.userID = userID
         self.image = image
+        self.image_version = image_version
         self.timestamp = timestamp
         self.port = eval(port)
         # 注意！ 销毁的deployement的时间戳是setUP时的timestamp！
@@ -18,14 +18,15 @@ class K8sOperator():
                                         str(self.userID),
                                         str(self.timestamp))
         logging.info("New K8sOperator instance has been created.")
-        logging.info("Instance_Info: type = %s ; userID = %s ; image = %s ; timestamp = %s " %
-                     (str(self.type) , str(self.userID) , str(self.image) , str(self.timestamp))
+        logging.info("Instance_Info: type = %s ; userID = %s ; image = %s ; image_version = %s ; timestamp = %s ; port = %s" %
+                     (str(self.type) , str(self.userID) , str(self.image),
+                      str(self.image_version), str(self.timestamp), str(self.port))
                      )
 
     # 创建deployment 的函数 , return string 相应的kubectl命令
     def setUpDeployment(self):
-        # 组合成命令为类似 kubectl create deployment nginx-mike-20180502 --image=nginx 的形式
-        k8s_cmd = "kubectl create deployment %s --image=%s" % (self.k8s_deploy_name, str(self.image))
+        # 组合成命令为类似 kubectl create deployment nginx-mike-20180502 --image=nginx:lastest 的形式
+        k8s_cmd = "kubectl create deployment %s --image=%s:%s" % (self.k8s_deploy_name, str(self.image), str(self.image_version))
         logging.critical("The k8s command is:%s" % k8s_cmd)
 
         return k8s_cmd
@@ -73,31 +74,40 @@ class K8sOperator():
         return k8s_cmd
 
     # 用于查询 k8s 启动的service的相关端口
-    def getServiceCmd(self):
+    def findServiceCmd(self):
         k8s_cmd = "kubectl get service | grep %s" % self.k8s_deploy_name
-        logging.critical("The k8s command is:%s" % k8s_cmd)
+        logging.critical("findServiceCmd() The k8s command is:%s" % k8s_cmd)
 
         return k8s_cmd
 
     # 用于查询 k8s 的 Pod name
-    def getPodnameCmd(self):
+    def findPodnameCmd(self):
         k8s_cmd = "kubectl get pods | grep %s" % self.k8s_deploy_name
-        logging.critical("The k8s command is:%s" % k8s_cmd)
+        logging.critical("findPodnameCmd() The k8s command is:%s" % k8s_cmd)
 
         return k8s_cmd
 
     # 用于查询 jupyter 启动时logs 中的 token , 需要传入一个pod name
-    def getTokenCmd(self,pod_name):
-        k8s_cmd = "kubectl logs pod %s | grep /?token" % pod_name
-        logging.critical("The k8s command is:%s" % k8s_cmd)
+    def findTokenCmd(self,pod_name):
+        k8s_cmd = "kubectl logs %s | grep /?token" % pod_name
+        logging.critical("findTokenCmd() The k8s command is:%s" % k8s_cmd)
 
         return k8s_cmd
 
+    # 返回组合出来的deployname
+    def getDeployName(self):
+        return self.k8s_deploy_name
+
     pass
 
+
+
 if __name__ == "__main__":
-    k8s_op = K8sOperator("setUP" , "mike" , 'nginx' , '20180202', "[80]")
-    k8s_op.setUpDeployment()
-    k8s_op.createNodeportService()
-    k8s_op.tearDownDeployment()
-    k8s_op.closeNodeportService()
+    k8s_obj = K8sObject("setup" , "mike" , '20180202' ,'jupyter' , port="[80]")
+    k8s_obj.setUpDeployment()
+    k8s_obj.createNodeportService()
+    k8s_obj.tearDownDeployment()
+    k8s_obj.closeNodeportService()
+    k8s_obj.findPodnameCmd()
+    k8s_obj.findServiceCmd()
+    k8s_obj.findTokenCmd("jupyter-68f8fc6dff-ww5c9")

@@ -1,14 +1,16 @@
 # -*- encoding:utf-8 -*-
 
-# The stucture of MQ message
 # {
-# 	"type":"setUP / tearDOWN / cycle",
+# 	"type":"setup / teardown / cycle",
 # 	"userID":"123456",
-# 	"image":"nginx:lastest",
-# 	"timestamp":"20180803"
+# 	"timestamp":"time"
+# 	"image":"nginx",
+# 	"imageversion":":lastest",
 # 	"port":"[80,90,8080]"
 # 	"lifespan":"3600"
 # }
+#
+# read os information in linux:
 #
 # Python 2.7.15 |Anaconda, Inc.| (default, May  1 2018, 23:32:55)
 # [GCC 7.2.0] on linux2
