@@ -7,11 +7,12 @@ logging.basicConfig(level=logging.INFO)
 class K8sOperator():
 
     # 需要的类型为 k8s_cmd 的类型 用户标识 启动的镜像 以及时间戳
-    def __init__(self , k8s_cmd_type , userID , image , timestamp):
+    def __init__(self , k8s_cmd_type , userID , image , timestamp , port="[]"):
         self.type = k8s_cmd_type
         self.userID = userID
         self.image = image
         self.timestamp = timestamp
+        self.port = eval(port)
         # 注意！ 销毁的deployement的时间戳是setUP时的timestamp！
         self.k8s_deploy_name = "%s-%s-%s" % (str(self.image),
                                         str(self.userID),
@@ -44,7 +45,21 @@ class K8sOperator():
         # 此处的 --tcp=80:80 代表docker容器上开放的端口
         # 至于容器具体分配到了哪个实际的端口 根据k8s
         # k8s随机在30000-32767之间进行分配
-        k8s_cmd = "kubectl create service nodeport %s --tcp=80:80" % self.k8s_deploy_name
+
+        # 如果port这个list中的数值为0 即没有要指定开通的端口
+        if len(self.port) is 0 :
+            # 这条指令是错误的 开启service必须指定至少一个Port 这会在linux里面报错
+            k8s_cmd = "kubectl create service nodeport %s --tcp=???:???"
+
+        # 如果指定了容器端口
+        else:
+            port_str = ""
+            for port in self.port:
+                # 这两个port是相同的 k8s这么规定的
+                port_str += " --tcp=%s:%s" % (port,port)
+            # 组合成为类似 kubectl create service nodeport nginx --tcp=80:80 的命令
+            k8s_cmd = "kubectl create service nodeport %s %s" % (self.k8s_deploy_name , port_str)
+
         logging.critical("The k8s command is:%s" % k8s_cmd)
 
         return k8s_cmd
@@ -58,15 +73,22 @@ class K8sOperator():
         return k8s_cmd
 
     # 用于查询 k8s 启动的service的相关端口
-    def grepGetService(self,grep_str):
-        k8s_cmd = "kubectl get service | grep %s" % grep_str
+    def getServiceCmd(self):
+        k8s_cmd = "kubectl get service | grep %s" % self.k8s_deploy_name
         logging.critical("The k8s command is:%s" % k8s_cmd)
 
         return k8s_cmd
 
-    # 用于查询 jupyter 启动时logs 中的 token
-    def grepGetToken(self,grep_str):
-        k8s_cmd = "kubectl logs service | grep %s" % grep_str
+    # 用于查询 k8s 的 Pod name
+    def getPodnameCmd(self):
+        k8s_cmd = "kubectl get pods | grep %s" % self.k8s_deploy_name
+        logging.critical("The k8s command is:%s" % k8s_cmd)
+
+        return k8s_cmd
+
+    # 用于查询 jupyter 启动时logs 中的 token , 需要传入一个pod name
+    def getTokenCmd(self,pod_name):
+        k8s_cmd = "kubectl logs pod %s | grep /?token" % pod_name
         logging.critical("The k8s command is:%s" % k8s_cmd)
 
         return k8s_cmd
@@ -74,6 +96,8 @@ class K8sOperator():
     pass
 
 if __name__ == "__main__":
-    k8s_op = K8sOperator("setUP" , "mike" , 'nginx' , '20180202')
+    k8s_op = K8sOperator("setUP" , "mike" , 'nginx' , '20180202', "[80]")
     k8s_op.setUpDeployment()
+    k8s_op.createNodeportService()
     k8s_op.tearDownDeployment()
+    k8s_op.closeNodeportService()
