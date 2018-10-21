@@ -3,5 +3,6 @@
   "port":61613,
   "queue_name":"/queue/Test_Queue",
   "username":"admin",
-  "password":"admin"
+  "password":"admin",
+  "jupyter_logs_try_times":20
 }
