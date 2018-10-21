@@ -66,14 +66,15 @@ class K8sOperator():
             i = 0
             token = self.findLogsToken()
             # 以防日志创建较为缓慢，因此在此循环，等待日志输出
-            while i < 5:
+            while i < 20:
+                i += 0
+                logging.info("Times of trying= %s" , str(i))
+                time.sleep(2)
                 if self.findLogsToken() is not "":
                     token = self.findLogsToken()
                     break
                 else:
-                    time.sleep(2)
-                    i += 0
-                    logging.info("Finding logs and token from Pod %s .Times of trying= %s" % (pod_name , str(i)))
+                    logging.info("Finding logs and token from Pod %s ." % (pod_name))
 
             # 如果没找到token ,则返回None 结束该函数
             if token is "" :
@@ -140,8 +141,8 @@ class K8sOperator():
         # 正则表达式
         pattern = "token=[a-f0-9]*"
         outputs_list = os.popen(self.k8s_obj.findTokenCmd(pod_name)).readlines()
-        token = ""
         for output in outputs_list:
+            print "output is = "
             # 如果找到token
             if re.search(pattern,output) is not None:
                 # 防止切完之后list越界
@@ -155,9 +156,9 @@ class K8sOperator():
                 # 继续找下一条日志
                 continue
             # 如果整个日志中都没有token
-            logging.error("findLogsToken() can not find the token.Will return None.")
-            # 返回None
-            return ""
+        logging.error("findLogsToken() can not find the token.Will return None.")
+        # 返回None
+        return ""
 
     # //ToDO: 目前仅能返回一个port 。在后续迭代中，如需返回多个port 需要修改这里的函数。
     # 利用linux的grep指令 返回deploy相应service的名字
