@@ -7,27 +7,45 @@ logging.basicConfig(level=logging.INFO)
 
 class K8sOperator():
 
-    def __init__(self, k8s_cmd_type, userID, timestamp, image, image_version="lastest", port="[]"):
+    def __init__(self, k8s_cmd_type, userID, timestamp, image, image_version="latest", port="[]"):
 
         self.k8s_obj = K8sObject(k8s_cmd_type, userID, timestamp, image, image_version, port)
 
     # 建立 Deploy 和 Service
     def setUpDeployAndService(self):
-        # os.system(self.k8s_obj.setUpDeployment())
-        # os.system(self.k8s_obj.createNodeportService())
-        self.k8s_obj.setUpDeployment()
-        self.k8s_obj.createNodeportService()
+        os.system(self.k8s_obj.setUpDeployment())
+        os.system(self.k8s_obj.createNodeportService())
+        # self.k8s_obj.setUpDeployment()
+        # self.k8s_obj.createNodeportService()
 
         pass
 
     # 销毁 Deploy 和 Service
     def tearDownDeployAndService(self):
-        # os.system(k8s_obj.closeNodeportService())
-        # os.system(tearDownDeployment())
-        self.k8s_obj.closeNodeportService()
-        self.k8s_obj.tearDownDeployment()
+        os.system(self.k8s_obj.closeNodeportService())
+        os.system(self.k8s_obj.tearDownDeployment())
+        # self.k8s_obj.closeNodeportService()
+        # self.k8s_obj.tearDownDeployment()
 
         pass
+
+    # 判定执行何种操作的函数
+    # 接下来的各种行为动作也应该在此执行
+    def checkAndDoCommandType(self):
+        # 若命令类型为setup
+        if self.k8s_obj.type is "setup" :
+            self.setUpDeployAndService()
+            logging.critical("Create k8s deployment %s and service %s." %
+                             (self.k8s_obj.getDeployName(),self.k8s_obj.getDeployName()))
+        # 若命令类型为teardown
+        elif self.k8s_obj.type is "teardown" :
+            self.tearDownDeployAndService()
+            logging.critical("Delete k8s deployment %s and service %s." %
+                         (self.k8s_obj.getDeployName(), self.k8s_obj.getDeployName()))
+        else:
+            logging.critical("The command type not correct.'type' only 'setup' and 'teardown' can be treated."
+                             " Your type = %s ." % self.k8s_obj.type)
+
 
     # 利用linux的grep指令 返回pod 的名字
     def findPodName(self):

@@ -6,7 +6,7 @@ logging.basicConfig(level=logging.INFO)
 class K8sObject():
 
     # 需要的类型为 k8s_cmd 的类型 用户标识 启动的镜像 以及时间戳
-    def __init__(self , k8s_cmd_type, userID, timestamp, image, image_version="lastest", port="[]"):
+    def __init__(self , k8s_cmd_type, userID, timestamp, image, image_version="latest", port="[]"):
         self.type = k8s_cmd_type
         self.userID = userID
         self.image = image
@@ -103,7 +103,7 @@ class K8sObject():
 
 
 if __name__ == "__main__":
-    k8s_obj = K8sObject("setup" , "mike" , '20180202' ,'jupyter' , port="[80]")
+    k8s_obj = K8sObject("setup" , "mike" , '20180202' ,'nginx' , port="[80]")
     k8s_obj.setUpDeployment()
     k8s_obj.createNodeportService()
     k8s_obj.tearDownDeployment()

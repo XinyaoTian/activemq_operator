@@ -2,6 +2,7 @@
 import stomp
 import time
 from datetime import datetime
+from K8sOperator import K8sOperator
 import logging
 # 注意 这里写的日志打印路径是在运行 MQreceiver.py 时 系统的pwd
 logging.basicConfig(filename='./logs/MQreceiver.log',format='[%(asctime)s-%(filename)s-%(levelname)s:%(message)s]', filemode='w',level = logging.ERROR,datefmt='%Y-%m-%d %I:%M:%S %p')
@@ -85,7 +86,12 @@ class Listener_k8s(stomp.ConnectionListener):
             if message_dict.has_key('type') and  message_dict.has_key('userID') \
                     and message_dict.has_key('image') and message_dict.has_key('timestamp'):
 
+
                 #ToDo : 调用K8sCmdFunc.py中的函数来实现功能
+                k8s_op = K8sOperator(message_dict['type'], message_dict['userID'], message_dict['timestamp'],
+                                     message_dict['image'], message_dict['image_version'], message_dict['port'])
+                k8s_op.checkAndDoCommandType()
+
                 pass
 
             # 否则，不予执行
