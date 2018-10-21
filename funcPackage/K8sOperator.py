@@ -47,7 +47,7 @@ class K8sOperator():
             logging.critical("Delete k8s deployment %s and service %s." %
                          (self.k8s_obj.getDeployName(), self.k8s_obj.getDeployName()))
         else:
-            logging.critical("The command type not correct.'type' only 'setup' and 'teardown' can be treated."
+            logging.error("The command type not correct.'type' only 'setup' and 'teardown' can be treated."
                              " Your type = %s ." % self.k8s_obj.type)
 
     # 专门用于操作k8s集群创建Jupyter的相应函数
@@ -82,28 +82,21 @@ class K8sOperator():
                 return None
 
             # 如果找到了齐全的pod_name port 和token
-            logging.critical("Find pod_name=%s port=%s and token=%s" % (pod_name,port,token))
+            logging.critical("Find pod_name=%s ; port=%s ; token=%s" % (pod_name,port,token))
+            result_dict = {"pod_name":pod_name , "port":port , "token":token}
             # ToDo:接下进行数据库操作，将它们写入数据库
-            print pod_name
-            print port
-            print token
-
-            pass
-
+            return result_dict
         # 若命令类型为teardown
         elif self.k8s_obj.type is "teardown" :
             self.tearDownDeployAndService()
             logging.critical("Delete k8s deployment %s and service %s." %
                          (self.k8s_obj.getDeployName(), self.k8s_obj.getDeployName()))
+            return None
         # 否则 类型不为 setup 和 teardown 则报错 什么都不执行
         else:
-            logging.critical("The command type not correct.'type' only 'setup' and 'teardown' can be treated."
+            logging.error("The command type not correct.'type' only 'setup' and 'teardown' can be treated."
                              " Your type = %s ." % self.k8s_obj.type)
             return None
-
-
-        pass
-
 
     # 利用linux的grep指令 返回pod 的名字
     def findPodName(self):
@@ -142,7 +135,6 @@ class K8sOperator():
         pattern = "token=[a-f0-9]*"
         outputs_list = os.popen(self.k8s_obj.findTokenCmd(pod_name)).readlines()
         for output in outputs_list:
-            print "output is = "
             # 如果找到token
             if re.search(pattern,output) is not None:
                 # 防止切完之后list越界
@@ -169,7 +161,6 @@ class K8sOperator():
         grep_results = os.popen(self.k8s_obj.findServiceCmd()).readlines()
         # ports = []
         for result in grep_results:
-            print result
             # 将linux命令输出结果与正则式相匹配
             if re.search(pattern, result) is not None:
                 port = str(re.search(pattern, result).group(0)).split(":")[1]

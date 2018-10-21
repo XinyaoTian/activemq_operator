@@ -17,8 +17,8 @@ class Listener(stomp.ConnectionListener):
     def on_message(self, headers, message):
         # logging.INFO(str(datetime.now()) + 'headers: %s' % headers)
         # logging.INFO(str(datetime.now()) + 'message: %s' % message)
-        print "headers : %s " % headers
-        print "message : %s " % message
+        # print "headers : %s " % headers
+        # print "message : %s " % message
         # print type(headers)
         # print type(message)
         if headers is not None :
@@ -38,8 +38,8 @@ class Listener_receive(stomp.ConnectionListener):
     def on_message(self, headers, message):
         # logging.INFO(str(datetime.now()) + 'headers: %s' % headers)
         # logging.INFO(str(datetime.now()) + 'message: %s' % message)
-        print "headers : %s " % headers
-        print "message : %s " % message
+        # print "headers : %s " % headers
+        # print "message : %s " % message
         # print type(headers)
         # print type(message)
         if headers is not None and message is not None:
@@ -52,8 +52,8 @@ class Listener_receive(stomp.ConnectionListener):
             logging.critical("headers : %s" % str(headers))
             logging.critical("message : %s" % str(message))
             if message_dict.has_key('command') :
-                cmd = str(message_dict['command'])
-                print cmd
+                # cmd = str(message_dict['command'])
+                # print cmd
                 os.system(message_dict['command'])
             else:
                 logging.error("No command in message.")
@@ -69,8 +69,8 @@ class Listener_k8s(stomp.ConnectionListener):
     def on_message(self, headers, message):
         # logging.INFO(str(datetime.now()) + 'headers: %s' % headers)
         # logging.INFO(str(datetime.now()) + 'message: %s' % message)
-        print "headers : %s " % headers
-        print "message : %s " % message
+        # print "headers : %s " % headers
+        # print "message : %s " % message
         # print type(headers)
         # print type(message)
         if headers is not None and message is not None:
@@ -88,15 +88,21 @@ class Listener_k8s(stomp.ConnectionListener):
                     and message_dict.has_key('image_version') and message_dict.has_key('port') \
                     and message_dict.has_key('deploy_name'):
 
-
-                #ToDo : 调用K8sCmdFunc.py中的函数来实现功能
                 k8s_op = K8sOperator(message_dict['type'], message_dict['deploy_name'],
                                      message_dict['userID'], message_dict['timestamp'],
                                      message_dict['image'], message_dict['image_version'], message_dict['port'])
-
                 # 这个函数是可以做几乎任何k8s命令的函数
                 # k8s_op.checkAndDoCommandType()
-                k8s_op.dealWithJupyter()
+
+                # 针对创建jupyter写的函数
+                result_dict = k8s_op.dealWithJupyter()
+
+                if result_dict is not None:
+                    logging.critical("Will operate DB.")
+                    # ToDo 将dict信息写入数据库中
+                    pass
+                else:
+                    logging.critical("Do not need to operate DB.")
 
                 pass
 
