@@ -138,7 +138,7 @@ class MQOperator():
     # 从消息队列接收消息
     def receiveFromQueue(self):
         # 初始化欲连接的Queue 指定Ip及Port
-        listener = Listener()
+        listener = Listener_k8s()
         conn = stomp.Connection10([(self.ip_address, int(self.port))])
         # 设置Lister的name及数据结构 根据官方文档 Listener应该为一个Class
         conn.set_listener(str(self.queue_name) + "_Listener", listener)
