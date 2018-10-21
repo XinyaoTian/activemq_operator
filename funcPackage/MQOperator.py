@@ -95,7 +95,7 @@ class Listener_k8s(stomp.ConnectionListener):
                 # k8s_op.checkAndDoCommandType()
 
                 # 针对创建jupyter写的函数
-                result_dict = k8s_op.dealWithJupyter(self.jupyter_logs_try_times)
+                result_dict = k8s_op.dealWithJupyter()
 
                 # 若成功返回了可以执行操作的dict
                 if result_dict is not None:
