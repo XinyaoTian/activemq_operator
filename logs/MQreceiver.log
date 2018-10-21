@@ -1,3 +1,3 @@
-[2018-10-21 08:21:01 PM-MQOperator.py-CRITICAL:MQOperator start.]
-[2018-10-21 08:21:01 PM-MQOperator.py-CRITICAL:Loading config from ./MQOperator_conf.json .]
-[2018-10-21 08:21:01 PM-MQOperator.py-CRITICAL:Your config information is {u'username': u'admin', u'password': u'admin', u'queue_name': u'/queue/Test_Queue', u'ip_address': u'39.107.239.80', u'port': 61613} .]
+[2018-10-21 08:29:42 PM-MQOperator.py-CRITICAL:MQOperator start.]
+[2018-10-21 08:29:42 PM-MQOperator.py-CRITICAL:Loading config from ./MQOperator_conf.json .]
+[2018-10-21 08:29:42 PM-MQOperator.py-CRITICAL:Your config information is {u'username': u'admin', u'password': u'admin', u'queue_name': u'/queue/Test_Queue', u'ip_address': u'39.107.239.80', u'port': 61613} .]

@@ -64,7 +64,7 @@ class K8sOperator():
             # 寻找分配好的相应port
             port = self.findDeployServicePort()
             i = 0
-            token = ""
+            token = self.findLogsToken()
             # 以防日志创建较为缓慢，因此在此循环，等待日志输出
             while i < 5:
                 if self.findLogsToken() is not "":
@@ -145,11 +145,10 @@ class K8sOperator():
             # 如果找到token
             if re.search(pattern,output) is not None:
                 # 防止切完之后list越界
-                if len(str(re.search(pattern,output).group(0)).split("token=")) is 2:
-                    token = str(re.search(pattern,output).group(0)).split("token=")[1]
-                    logging.critical("findLogsToken() the token is = %s" % token)
-                    # 立刻结束函数 因为日志有太多行了
-                    return token
+                token = str(re.search(pattern,output).group(0)).split("token=")[1]
+                logging.critical("findLogsToken() the token is = %s" % token)
+                # 立刻结束函数 因为日志有太多行了
+                return token
             # 否则
             else:
                 # 继续找下一条日志
@@ -165,7 +164,7 @@ class K8sOperator():
         # 组合出的正则匹配式子 其格式为 [0-9]*:[0-9]*
         pattern = "[0-9]*:[0-9]*"
         # 在linux中使用Grep进行 kubectl get service | grep deployname 匹配
-        grep_results = os.popen(self.k8s_obj.findPodnameCmd()).readlines()
+        grep_results = os.popen(self.k8s_obj.findServiceCmd()).readlines()
         ports = []
         for result in grep_results:
             # 将linux命令输出结果与正则式相匹配
