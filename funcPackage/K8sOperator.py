@@ -145,10 +145,11 @@ class K8sOperator():
             # 如果找到token
             if re.search(pattern,output) is not None:
                 # 防止切完之后list越界
-                token = str(re.search(pattern,output).group(0)).split("token=")[1]
-                logging.critical("findLogsToken() the token is = %s" % token)
-                # 立刻结束函数 因为日志有太多行了
-                return token
+                if len(str(re.search(pattern,output).group(0)).split("token=")) is 2:
+                    token = str(re.search(pattern,output).group(0)).split("token=")[1]
+                    logging.critical("findLogsToken() the token is = %s" % token)
+                    # 立刻结束函数 因为日志有太多行了
+                    return token
             # 否则
             else:
                 # 继续找下一条日志
@@ -165,7 +166,7 @@ class K8sOperator():
         pattern = "[0-9]*:[0-9]*"
         # 在linux中使用Grep进行 kubectl get service | grep deployname 匹配
         grep_results = os.popen(self.k8s_obj.findServiceCmd()).readlines()
-        ports = []
+        # ports = []
         for result in grep_results:
             # 将linux命令输出结果与正则式相匹配
             if re.search(pattern, result) is not None:
@@ -177,7 +178,7 @@ class K8sOperator():
                 # 否则，继续寻找下一条
                 continue
         logging.error("findDeployServicePort() service_name=%s can not find the port." % self.k8s_obj.getDeployName())
-        return None
+        return ""
 
 
 

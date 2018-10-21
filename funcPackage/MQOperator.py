@@ -93,6 +93,8 @@ class Listener_k8s(stomp.ConnectionListener):
                 k8s_op = K8sOperator(message_dict['type'], message_dict['deploy_name'],
                                      message_dict['userID'], message_dict['timestamp'],
                                      message_dict['image'], message_dict['image_version'], message_dict['port'])
+
+                # 这个函数是可以做几乎任何k8s命令的函数
                 # k8s_op.checkAndDoCommandType()
                 k8s_op.dealWithJupyter()
 
