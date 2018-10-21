@@ -3,6 +3,7 @@ import stomp
 import time
 from datetime import datetime
 from K8sOperator import K8sOperator
+from MongoDBOperator import MongoDBOperator
 import logging
 # 注意 这里写的日志打印路径是在运行 MQreceiver.py 时 系统的pwd
 logging.basicConfig(filename='./logs/MQreceiver.log',format='[%(asctime)s-%(filename)s-%(levelname)s:%(message)s]', filemode='w',level = logging.ERROR,datefmt='%Y-%m-%d %I:%M:%S %p')
@@ -64,6 +65,21 @@ class Listener_receive(stomp.ConnectionListener):
 
 # 改进的 Listener 类 ，拥有特定的用法 ; 根据官方文档书写，作为监听ActiveMQ队列的对象
 class Listener_k8s(stomp.ConnectionListener):
+    # 将配置文件中的信息载入至类中
+    def __init__(self, config_path="../MQOperator_conf.json"):
+        logging.critical("MongoDBOperator start.")
+        logging.critical("Loading config from %s ." % config_path)
+        try:
+            config_dict = get_conf(config_path)
+            logging.critical("Your config information is %s ." % config_dict)
+            self.mongoDBhost = config_dict['mongoDBhost']
+            self.mongoDBport = config_dict['mongoDBport']
+            self.mongoDBusername = config_dict['mongoDBusername']
+            self.mongoDBpwd = config_dict['mongoDBpwd']
+        except:
+            logging.ERROR("The configration file can not load correctly.Please check %s again." % config_path)
+            raise Exception
+
 
     # 从ActiveMQ中接收到消息时的动作 这个函数是stomp包 fork一个子进程去执行的 因此可以并发
     def on_message(self, headers, message):
@@ -101,6 +117,10 @@ class Listener_k8s(stomp.ConnectionListener):
                 if result_dict is not None:
                     logging.critical("Will operate DB.dict = %s" % str(result_dict))
                     # ToDo 将dict信息写入数据库中
+                    mdb_op = MongoDBOperator(self.mongoDBhost, self.mongoDBport,
+                                             self.mongoDBusername, self.mongoDBpwd)
+                    mdb_op.insertDict(result_dict)
+                    # 写入完毕
                     pass
                 else:
                     logging.critical("result_dict = None .Do not need to operate DB.")
@@ -121,6 +141,7 @@ class MQOperator():
 
     # 将配置文件中的信息载入至类中
     def __init__(self,config_path = "../MQOperator_conf.json"):
+        self.config_path = config_path
         logging.critical("MQOperator start.")
         logging.critical("Loading config from %s ." % config_path)
         try:
@@ -151,7 +172,7 @@ class MQOperator():
     # 从消息队列接收消息
     def receiveFromQueue(self):
         # 初始化欲连接的Queue 指定Ip及Port
-        listener = Listener_k8s()
+        listener = Listener_k8s(config_path=self.config_path)
         conn = stomp.Connection10([(self.ip_address, int(self.port))])
         # 设置Lister的name及数据结构 根据官方文档 Listener应该为一个Class
         conn.set_listener(str(self.queue_name) + "_Listener", listener)

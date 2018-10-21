@@ -3,5 +3,9 @@
   "port":61613,
   "queue_name":"/queue/Test_Queue",
   "username":"admin",
-  "password":"admin"
+  "password":"admin",
+  "mongoDBhost":"39.107.239.80",
+  "mongoDBport":27017,
+  "mongoDBusername":"k8s_user",
+  "mongoDBpwd":"mypass"
 }
