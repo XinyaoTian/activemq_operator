@@ -1,12 +1,13 @@
 # -*- encoding:utf-8 -*-
 
 import logging
-logging.basicConfig(filename='./logs/MQreceiver.log',format='[%(asctime)s-%(filename)s-%(levelname)s:%(message)s]', filemode='w',level = logging.ERROR,datefmt='%Y-%m-%d %I:%M:%S %p')
+logging.basicConfig(level=logging.INFO)
+# logging.basicConfig(filename='./logs/MQreceiver.log',format='[%(asctime)s-%(filename)s-%(levelname)s:%(message)s]', filemode='w',level = logging.ERROR,datefmt='%Y-%m-%d %I:%M:%S %p')
 
 class K8sObject():
 
     # 需要的类型为 k8s_cmd 的类型 用户标识 启动的镜像 以及时间戳
-    def __init__(self , k8s_cmd_type, userID, timestamp, image, image_version="latest", port="[]"):
+    def __init__(self , k8s_cmd_type, deploy_name, userID, timestamp, image, image_version="latest", port="[]"):
         self.type = k8s_cmd_type
         self.userID = userID
         self.image = image
@@ -14,9 +15,10 @@ class K8sObject():
         self.timestamp = timestamp
         self.port = eval(port)
         # 注意！ 销毁的deployement的时间戳是setUP时的timestamp！
-        self.k8s_deploy_name = "%s-%s-%s" % (str(self.image),
-                                        str(self.userID),
-                                        str(self.timestamp))
+        # self.k8s_deploy_name = "%s-%s-%s" % (str(self.image),
+        #                                 str(self.userID),
+        #                                 str(self.timestamp))
+        self.k8s_deploy_name = deploy_name
         logging.info("New K8sOperator instance has been created.")
         logging.info("Instance_Info: type = %s ; userID = %s ; image = %s ; image_version = %s ; timestamp = %s ; port = %s" %
                      (str(self.type) , str(self.userID) , str(self.image),
@@ -103,7 +105,7 @@ class K8sObject():
 
 
 if __name__ == "__main__":
-    k8s_obj = K8sObject("setup" , "mike" , '20180202' ,'nginx' , port="[80]")
+    k8s_obj = K8sObject("setup", "nginx-mike-0505", "mike" , '20180202' ,'nginx' , port="[80]")
     k8s_obj.setUpDeployment()
     k8s_obj.createNodeportService()
     k8s_obj.tearDownDeployment()

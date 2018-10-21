@@ -84,13 +84,17 @@ class Listener_k8s(stomp.ConnectionListener):
             logging.critical("message : %s" % str(message))
             # 若这个消息是完整的
             if message_dict.has_key('type') and  message_dict.has_key('userID') \
-                    and message_dict.has_key('image') and message_dict.has_key('timestamp'):
+                    and message_dict.has_key('image') and message_dict.has_key('timestamp')\
+                    and message_dict.has_key('image_version') and message_dict.has_key('port') \
+                    and message_dict.has_key('deploy_name'):
 
 
                 #ToDo : 调用K8sCmdFunc.py中的函数来实现功能
-                k8s_op = K8sOperator(message_dict['type'], message_dict['userID'], message_dict['timestamp'],
+                k8s_op = K8sOperator(message_dict['type'], message_dict['deploy_name'],
+                                     message_dict['userID'], message_dict['timestamp'],
                                      message_dict['image'], message_dict['image_version'], message_dict['port'])
-                k8s_op.checkAndDoCommandType()
+                # k8s_op.checkAndDoCommandType()
+                k8s_op.dealWithJupyter()
 
                 pass
 
