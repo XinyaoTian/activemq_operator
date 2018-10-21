@@ -3,7 +3,8 @@ from K8sCmdFunc import K8sObject
 import os
 import re
 import logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(filename='./logs/MQreceiver.log',format='[%(asctime)s-%(filename)s-%(levelname)s:%(message)s]', filemode='w',level = logging.ERROR,datefmt='%Y-%m-%d %I:%M:%S %p')
+
 
 class K8sOperator():
 
