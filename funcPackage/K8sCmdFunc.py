@@ -1,8 +1,8 @@
 # -*- encoding:utf-8 -*-
 
 import logging
-# logging.basicConfig(level=logging.INFO)
-logging.basicConfig(filename='./logs/MQreceiver.log',format='[%(asctime)s-%(filename)s-%(levelname)s:%(message)s]', filemode='w',level = logging.ERROR,datefmt='%Y-%m-%d %I:%M:%S %p')
+logging.basicConfig(level=logging.INFO)
+# logging.basicConfig(filename='./logs/MQreceiver.log',format='[%(asctime)s-%(filename)s-%(levelname)s:%(message)s]', filemode='w',level = logging.ERROR,datefmt='%Y-%m-%d %I:%M:%S %p')
 
 class K8sObject():
 
@@ -105,7 +105,7 @@ class K8sObject():
 
 
 if __name__ == "__main__":
-    k8s_obj = K8sObject("setup", "nginx-mike-0505", "mike" , '20180202' ,'nginx' , port="[80]")
+    k8s_obj = K8sObject("setup", "jupyter-mike-0902", "mike" , '20180702' ,'jupyter/mini' , port="[8080]")
     k8s_obj.setUpDeployment()
     k8s_obj.createNodeportService()
     k8s_obj.tearDownDeployment()

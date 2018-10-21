@@ -168,12 +168,13 @@ class K8sOperator():
         grep_results = os.popen(self.k8s_obj.findServiceCmd()).readlines()
         # ports = []
         for result in grep_results:
+            print result
             # 将linux命令输出结果与正则式相匹配
             if re.search(pattern, result) is not None:
                 port = str(re.search(pattern, result).group(0)).split(":")[1]
                 # 立刻返回port
-                logging.critical("findDeployServicePort() the port is = %s" % port)
-                return port
+                logging.critical("findDeployServicePort() the port is = %s" % str(port))
+                return str(port)
             else:
                 # 否则，继续寻找下一条
                 continue
@@ -193,6 +194,6 @@ if __name__ == "__main__":
 
     output = "jupyter      NodePort    10.104.238.252   <none>        8888:31366/TCP   1d"
     pattern = "[0-9]*:[0-9]*"
-    print str(re.search(pattern, output).group(0))
+    print str(re.search(pattern, output).group(0)).split(":")[1]
 
     pass
