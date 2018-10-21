@@ -57,6 +57,8 @@ class K8sOperator():
             self.setUpDeployAndService()
             logging.critical("Create k8s deployment %s and service %s." %
                              (self.k8s_obj.getDeployName(),self.k8s_obj.getDeployName()))
+            # 等待创建3秒
+            time.sleep(3)
             # 利用linux命令寻找pod_name
             pod_name = self.findPodName()
             # 寻找分配好的相应port
