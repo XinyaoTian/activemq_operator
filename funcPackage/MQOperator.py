@@ -97,12 +97,13 @@ class Listener_k8s(stomp.ConnectionListener):
                 # 针对创建jupyter写的函数
                 result_dict = k8s_op.dealWithJupyter()
 
+                # 若成功返回了可以执行操作的dict
                 if result_dict is not None:
-                    logging.critical("Will operate DB.")
+                    logging.critical("Will operate DB.dict = %s" % str(result_dict))
                     # ToDo 将dict信息写入数据库中
                     pass
                 else:
-                    logging.critical("Do not need to operate DB.")
+                    logging.critical("result_dict = None .Do not need to operate DB.")
 
                 pass
 

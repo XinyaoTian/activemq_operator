@@ -83,8 +83,14 @@ class K8sOperator():
 
             # 如果找到了齐全的pod_name port 和token
             logging.critical("Find pod_name=%s ; port=%s ; token=%s" % (pod_name,port,token))
-            result_dict = {"pod_name":pod_name , "port":port , "token":token}
-            # ToDo:接下进行数据库操作，将它们写入数据库
+            result_dict = {"deploy_name":self.k8s_obj.k8s_deploy_name,
+                           "userID": self.k8s_obj.userID ,
+                           "timestamp":self.k8s_obj.timestamp,
+                           "image":self.k8s_obj.image,
+                           "image_version":self.k8s_obj.image_version,
+                           "container_port":self.k8s_obj.port,
+                           "pod_name":pod_name , "external_port":port , "token":token}
+            # 接下来在外层调用函数时 进行数据库操作，将它们写入数据库
             return result_dict
         # 若命令类型为teardown
         elif self.k8s_obj.type is "teardown" :
