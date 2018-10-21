@@ -51,7 +51,7 @@ class K8sOperator():
                              " Your type = %s ." % self.k8s_obj.type)
 
     # 专门用于操作k8s集群创建Jupyter的相应函数
-    def dealWithJupyter(self , try_times=20):
+    def dealWithJupyter(self):
         # 若命令为setup
         if self.k8s_obj.type is "setup" :
             self.setUpDeployAndService()
@@ -66,7 +66,7 @@ class K8sOperator():
             i = 0
             token = self.findLogsToken()
             # 以防日志创建较为缓慢，因此在此循环，等待日志输出
-            while i < try_times:
+            while i < 30:
                 i += 0
                 logging.info("Times of trying= %s" , str(i))
                 time.sleep(2)
