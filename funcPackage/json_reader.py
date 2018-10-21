@@ -2,7 +2,7 @@
 import json
 import logging
 # 注意 这里写的日志打印路径是在运行 MQreceiver.py 时 系统的pwd
-logging.basicConfig(filename='./logs/MQreceiver.log',format='[%(asctime)s-%(filename)s-%(levelname)s:%(message)s]', filemode='w',level = logging.ERROR,datefmt='%Y-%m-%d %I:%M:%S %p')
+logging.basicConfig(filename='./logs/MQreceiver.log',format='[%(asctime)s-%(filename)s-%(levelname)s:%(message)s]', filemode='a',level = logging.ERROR,datefmt='%Y-%m-%d %I:%M:%S %p')
 
 
 # 读取默认位置的配置文件 特别注意测试和运行时刻的工作路径!

@@ -6,7 +6,7 @@ from K8sOperator import K8sOperator
 from MongoDBOperator import MongoDBOperator
 import logging
 # 注意 这里写的日志打印路径是在运行 MQreceiver.py 时 系统的pwd
-logging.basicConfig(filename='./logs/MQreceiver.log',format='[%(asctime)s-%(filename)s-%(levelname)s:%(message)s]', filemode='w',level = logging.ERROR,datefmt='%Y-%m-%d %I:%M:%S %p')
+logging.basicConfig(filename='./logs/MQreceiver.log',format='[%(asctime)s-%(filename)s-%(levelname)s:%(message)s]', filemode='a',level = logging.ERROR,datefmt='%Y-%m-%d %I:%M:%S %p')
 
 import os
 
@@ -67,17 +67,17 @@ class Listener_receive(stomp.ConnectionListener):
 class Listener_k8s(stomp.ConnectionListener):
     # 将配置文件中的信息载入至类中
     def __init__(self, config_path="../MQOperator_conf.json"):
-        logging.critical("MongoDBOperator start.")
-        logging.critical("Loading config from %s ." % config_path)
+        logging.info("MongoDBOperator start.")
+        logging.info("Loading config from %s ." % config_path)
         try:
             config_dict = get_conf(config_path)
-            logging.critical("Your config information is %s ." % config_dict)
+            logging.info("Your config information is %s ." % config_dict)
             self.mongoDBhost = config_dict['mongoDBhost']
             self.mongoDBport = config_dict['mongoDBport']
             self.mongoDBusername = config_dict['mongoDBusername']
             self.mongoDBpwd = config_dict['mongoDBpwd']
         except:
-            logging.ERROR("The configration file can not load correctly.Please check %s again." % config_path)
+            logging.error("The configration file can not load correctly.Please check %s again." % config_path)
             raise Exception
 
 
@@ -153,7 +153,7 @@ class MQOperator():
             self.username = config_dict['username']
             self.password = config_dict['password']
         except:
-            logging.ERROR("The configration file can not load correctly.Please check %s again." % config_path)
+            logging.error("The configration file can not load correctly.Please check %s again." % config_path)
             raise Exception
 
     # 向ActiveMQ发送消息

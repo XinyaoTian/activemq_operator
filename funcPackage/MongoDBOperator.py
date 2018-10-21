@@ -1,7 +1,8 @@
 # -*-encoding:utf-8-*-
 import pymongo
 import logging
-logging.basicConfig(level=logging.ERROR)
+logging.basicConfig(filename='./logs/MQreceiver.log',format='[%(asctime)s-%(filename)s-%(levelname)s:%(message)s]', filemode='a',level = logging.ERROR,datefmt='%Y-%m-%d %I:%M:%S %p')
+
 
 class MongoDBOperator():
 
